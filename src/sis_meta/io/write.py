@@ -68,7 +68,7 @@ def build_meta(positions, lengths, ids, texts):
     The lists pass as arguments must have the same lenght.
     """
     # Load template
-    template_path = files('sis_meta') / 'template.meta'
+    template_path = files('sis_meta.io') / 'template.meta'
     data = template_path.read_bytes()
 
     n_items = len(positions)
