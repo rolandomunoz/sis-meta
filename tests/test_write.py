@@ -1,5 +1,5 @@
 """
-Read meta files.
+Write meta files.
 """
 import sys
 from pathlib import Path
