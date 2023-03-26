@@ -12,6 +12,10 @@ for meta_path in data_dir.glob('*.meta'):
     meta = sis_meta.read_from_file(meta_path)
 
     print(meta_path.name)
-    for mark in meta:
-        print(mark)
-    print()
+    for guide_mark in meta:
+        print('')
+        print('position: ', guide_mark.position)
+        print('length: ', guide_mark.length)
+        print('group_id: ', guide_mark.group_id)
+        print('group_name: ', guide_mark.group_name)
+
