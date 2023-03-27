@@ -61,7 +61,7 @@ def build_meta(positions, lengths, ids, texts):
     , 3, 4, 6, 7, 8, 9, 10, 11 and 13. I recommmend to use only 6, 7, 8
     and 9. Those are M1, M2, F1 and F2 groups.
 
-    TEXT_ATTR_POSITIONS, TEXT_ATTR_LENGTHS, TEXT_ATTR_TYPES and 
+    TEXT_ATTR_POSITIONS, TEXT_ATTR_LENGTHS, TEXT_ATTR_TYPES and
     TEXT_ATTR_VALUES seem to have the same attributes; so I decided to
     copy the values of TEXT_ATTR_POSITIONS on the other's parts.
 
@@ -76,41 +76,25 @@ def build_meta(positions, lengths, ids, texts):
     # Replace values:
     # MARKS_SEGMENT
     # POSITIONS
-    position_size = f'{n_items*8+4}'.encode()
-    data = data.replace(b'{{ positions_size }}', position_size)
-
-    bytes_line = pack('L', n_items) + pack(f'{n_items}d', *positions)
-    data = data.replace(b'{{ positions }}', bytes_line)
+    bytes_block = pack(f'=I{n_items}d', n_items, *positions)
+    data = _update_meta(data, bytes_block, '{{ positions_size }}', '{{ positions }}')
 
     # LENGTHS
-    lengths_size = f'{n_items*8+4}'.encode()
-    data = data.replace(b'{{ lengths_size }}', lengths_size)
-
-    bytes_line = pack('L', n_items) + pack(f'{n_items}d', *lengths)
-    data = data.replace(b'{{ lengths }}', bytes_line)
+    bytes_block = pack(f'=I{n_items}d', n_items, *lengths)
+    data = _update_meta(data, bytes_block, '{{ lengths_size }}', '{{ lengths }}')
 
     # IDS
-    ids_size = bytes(f'{n_items*4+4}', 'utf-8')
-    data = data.replace(b'{{ ids_size }}', ids_size)
-
-    bytes_line = pack('L', n_items) + pack(f'{n_items}L', *ids)
-    data = data.replace(b'{{ ids }}', bytes_line)
+    bytes_block = pack(f'=I{n_items}L', n_items, *ids)
+    data = _update_meta(data, bytes_block, '{{ ids_size }}', '{{ ids }}')
 
     # TEXTS
-    texts_bytes = [text.encode() for text in texts]
-    texts_bytes = [text.replace(b'\n', bytes.fromhex('02')) for text in texts_bytes] #Start of Text: U+0002
-    texts_bytes = [text.replace(b';', bytes.fromhex('03')) for text in texts_bytes] #End of Text: U+0003
-    texts_bytes = [b'_|!!|_nuse' if text == b'' else text for text in texts_bytes]
-    bytes_line = b';'.join(texts_bytes)
-    data = data.replace(b'{{ texts }}', bytes_line)
+    bytes_block = _norm_text(texts)
+    data = _update_meta(data, bytes_block, data_tag = '{{ texts }}')
 
     # TEXT_ATTR_POSITIONS
-    attr_size = bytes(f'{n_items*4+4}', 'utf-8')
-    data = data.replace(b'{{ attr_size }}', attr_size)
-
     zeroes = [0]*n_items
-    bytes_line = pack('I', n_items) + pack(f'{n_items}I', *zeroes)
-    data = data.replace(b'{{ text_attr_positions }}', bytes_line)
+    bytes_block = pack(f'=I{n_items}I', n_items, *zeroes)
+    data = _update_meta(data, bytes_block, '{{ attr_size }}', '{{ text_attr_positions }}')
 
     # TEXT_ATTR_LENGTHS
 
@@ -125,4 +109,68 @@ def build_meta(positions, lengths, ids, texts):
     match = MARKS_GROUPS_DATA.match(data)
     data = data.replace(b'{{ file_size }}', str(len(match.group(1))).encode())
 
+    return data
+
+def _norm_text(text_list):
+    """
+    Normalize texts in SIS format.
+
+    Parameters
+    ----------
+    text_list : str
+        A list of texts encoded in utf-8.
+
+    Returns
+    -------
+    bytes
+        A block of bytes containing the texts required in SIS format.
+
+    Notes
+    -----
+    SIS does not allow some characters as texts:
+        - Semicolons (``;``) are replaced by ``U+0002``
+        - New lines (``\n``) are replaced by ``U+0003``
+        - Empty characters (``''``) are replaced by ``_|!!|_nuse``
+    """
+    texts_bytes = [text.encode() for text in text_list]
+    texts_bytes = [text.replace(b'\n', bytes.fromhex('02')) for text in texts_bytes] #Start of Text: U+0002
+    texts_bytes = [text.replace(b';', bytes.fromhex('03')) for text in texts_bytes] #End of Text: U+0003
+    texts_bytes = [b'_|!!|_nuse' if text == b'' else text for text in texts_bytes]
+    return b';'.join(texts_bytes)
+
+def _update_meta(data, bytes_block, size_tag = None, data_tag = None):
+    """
+    Update the content of the meta template.
+
+    Parameters
+    ----------
+    data : bytes
+        The content of the meta template.
+    bytes_block : bytes
+        The new data to be inserted in the tags.
+    size_tag : str
+        The name of the tag where the size of the data given bytes will be replaced
+        with. The size is calculated automatically from the ``byte_blocks`` 
+        parameter.
+    data_tag : str
+        The name of the tag where the ``byte_blocks`` will be replaced with.
+
+    Returns
+    -------
+    bytes
+        A new version of the ``data`` parameter where values in tags are 
+        replaced with those in ``byte_blocks``.
+
+    Notes
+    -----
+    These are the valid tags:
+        {{ positions_size }}, {{ positions }}
+        {{ ids_size }}, {{ ids }}
+        {{ lengths_size }}, {{ lengths }}
+        {{ attr_size }}, {{ text_attr_positions }}
+    """
+    if not size_tag is None:
+        data = data.replace(size_tag.encode(), f'{len(bytes_block)}'.encode())
+    if not data_tag is None:
+        data = data.replace(data_tag.encode(), bytes_block)
     return data
