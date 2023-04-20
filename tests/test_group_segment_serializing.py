@@ -9,6 +9,7 @@ from sis_meta.io._serialize_groups_segment import serialize_groups_segment
 from sis_meta import GroupsSegment
 
 groups_segment = GroupsSegment()
-serialize_groups_segment(groups_segment.data)
+groups_segment_str = serialize_groups_segment(groups_segment.data)
 
-#pprint(tree, sort_dicts = False)
+with open('test-output.meta', 'w', newline = '\n') as file_text:
+    file_text.write(groups_segment_str)
