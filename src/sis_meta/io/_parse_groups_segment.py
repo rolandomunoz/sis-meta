@@ -49,16 +49,16 @@ def discover_grouptree(data, tree):
             data_temp = data.read()
 
             if GROUP.match(data_temp):
-                mark_group_content = GROUP.match(data_temp)
+                group_content = GROUP.match(data_temp)
                 dict_ = {
-                    'id': int(mark_group_content.group('id').decode()),
-                    'name': mark_group_content.group('name').decode(),
-                    'color': mark_group_content.group('color').decode(),
-                    'hotkey': mark_group_content.group('hotkey').decode(),
-                    'userparam': mark_group_content.group('userparam').decode(),
+                    'id': int(group_content.group('id').decode()),
+                    'name': group_content.group('name').decode(),
+                    'color': group_content.group('color').decode(),
+                    'hotkey': group_content.group('hotkey').decode(),
+                    'userparam': group_content.group('userparam').decode(),
                 }
                 tree.append(dict_)
-                current_position+= len(mark_group_content.group(0))
+                current_position+= len(group_content.group(0))
             data.seek(current_position)
 
         # Recursive condition

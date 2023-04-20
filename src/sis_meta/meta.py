@@ -11,7 +11,7 @@ class Meta:
     def __iter__(self):
         return iter(self.data)
 
-    def insert_guide_mark(self, position, length = 0, text = '', group_id = 6):
+    def insert_guide_mark(self, position, length= 0, text= '', group_id= 6):
         """
         Insert a guide mark.
         """
