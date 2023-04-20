@@ -79,6 +79,25 @@ class MarksGroup:
             f'mark group "{name[0]}" does not exist.'
         )
 
+    @staticmethod
+    def _norm_path(path):
+        """
+        Normalize path.
+
+        Parameters
+        ----------
+        path : str
+            The path of a mark group.
+
+        Returns
+        -------
+        str
+            The normalized path.
+        """
+        if not path.startswith('All marks'):
+            path = 'All marks' if path == '' else f'All marks/{path}'
+        return path
+
     def insert(self, path, new_name, color=0, hotkey= 0, userparam=0):
         """
         Insert a mark group.
@@ -112,9 +131,7 @@ class MarksGroup:
         >>> marks_group.insert('TextGrid', 'Javier')
         >>> marks_group.insert('TextGrid', 'Rolando')
         """
-        if not path.startswith('All marks'):
-            path = f'All marks/{path}'
-
+        path = self._norm_path(path)
         parent_names = path.split('/')
 
         tree = self._find_element(self.data, parent_names)
@@ -144,10 +161,9 @@ class MarksGroup:
         userparam : int, default `None` 
             Unkown yet.
         """
-        if not path.startswith('All marks'):
-            path = f'All marks/{path}'
-
+        path = self._norm_path(path)
         path_list = path.split('/')
+
         tree = self._find_element(self.data, path_list)
 
         if not name is None:
@@ -173,10 +189,9 @@ class MarksGroup:
             a target mark group in nested inside more than one group,
             use forward slashes (`/`) between the subgroups' names.
         """
-        if not path.startswith('All marks'):
-            path = f'All marks/{path}'
-
+        path = self._norm_path(path)
         path_list = path.split('/')
+
         name = path_list[-1]
         parents = path_list[:-1]
 
