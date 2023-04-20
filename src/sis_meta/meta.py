@@ -1,12 +1,15 @@
 """
 Handle annotation files (.meta).
 """
+import sis_meta
+
 class Meta:
     """
     Class for handling guide marks.
     """
     def __init__(self):
         self.data = []
+        self.groups_segment = sis_meta.GroupsSegment()
 
     def __iter__(self):
         return iter(self.data)

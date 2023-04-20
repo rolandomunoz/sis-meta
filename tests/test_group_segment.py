@@ -29,4 +29,5 @@ groups_segment.update('TextGrid/Luis', 'Luis Alberto', 15, 3, 3)
 # Remove
 groups_segment.remove('Adobe Audition/José Roberto')
 
-pprint(groups_segment.data, sort_dicts = False)
+print(groups_segment)
+#pprint(groups_segment.data, sort_dicts = False)

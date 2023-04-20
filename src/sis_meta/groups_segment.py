@@ -6,6 +6,7 @@ import io
 from importlib.resources import files
 
 from sis_meta.io._parse_groups_segment import discover_grouptree
+from sis_meta.io._serialize_groups_segment import serialize_groups_segment
 
 GROUPS_SEGMENT= re.compile(
 rb'''MARKS_GROUPS_DATA; BEGIN; COMPOSITE;BINARY;\d+
@@ -38,6 +39,9 @@ class GroupsSegment:
                     []
                 )
         self.group_id = self._find_max_id(self.data)
+
+    def __repr__(self):
+        return serialize_groups_segment(self.data)
 
     def _find_max_id(self, data):
         """
