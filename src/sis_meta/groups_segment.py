@@ -1,10 +1,9 @@
 """
-Class for handling MARKS_GROUP in meta file.
+Class for handling GROUPS_SEGMENT in meta file.
 """
 import re
 import io
 from importlib.resources import files
-from pprint import pprint
 
 from sis_meta.io._parse_groups_segment import discover_grouptree
 
@@ -18,9 +17,9 @@ GROUPS_SEGMENT; END
 ''', re.DOTALL
 )
 
-class MarksGroup:
+class GroupsSegment:
     """
-    A class for handling MARKS_GROUP_DATA
+    A class for handling GROUPS_SEGMENT
     """
     def __init__(self, path= None):
         self.data = None
@@ -42,7 +41,7 @@ class MarksGroup:
 
     def _find_max_id(self, data):
         """
-        Find the max group id in a MARK_GROUP tree.
+        Find the higher ID in GROUPS_SEGMENT.
         """
         for dict_ in data:
             max_value = dict_['id']
@@ -51,37 +50,37 @@ class MarksGroup:
                 max_value = current_value if current_value > max_value else max_value
         return max_value
 
-    def _find_mark_group(self, data, path):
+    def _find_group(self, data, path):
         """
-        Find a MARK_GROUP dict.
+        Find a GROUP dict.
         """
-        mark_group_name = path[0]
-        mark_group_name_path = path[1:]
+        group_name = path[0]
+        group_name_path = path[1:]
 
         # Base case
-        if len(mark_group_name_path) == 0: # Each element in the path has been consumed
+        if len(group_name_path) == 0: # Each element in the path has been consumed
             for dict_ in data:
-                if dict_['name'] == mark_group_name:
+                if dict_['name'] == group_name:
                     return dict_
             return None
 
         # Recursive case
         for dict_ in data:
-            if not dict_['name'] == mark_group_name:
+            if not dict_['name'] == group_name:
                 continue
 
             if 'child' in dict_:
-                return self._find_mark_group(dict_['child'], mark_group_name_path)
+                return self._find_group(dict_['child'], group_name_path)
 
     @staticmethod
     def _norm_path(path):
         """
-        Normalize a MARK_GROUP path.
+        Normalize a GROUP path.
 
         Parameters
         ----------
         path : str
-            The path of a mark group.
+            The path of a GROUP.
 
         Returns
         -------
@@ -94,35 +93,35 @@ class MarksGroup:
 
     def is_path(self, path):
         """
-        Check if the MARK_GROUP path exists.
+        Check if the GROUP path exists.
 
         Parameter
         ---------
         path : str
-            The path of a MARK_GROUP.
+            The path of a GROUP.
 
         Returns
         -------
         bool
-            Return `True` if the path exists; otherwise, `False`.
+            Return `True` if the GROUP path exists; otherwise, `False`.
         """
         path_list = self._norm_path(path).split('/')
-        path_exists = self._find_mark_group(self.data, path_list)
+        path_exists = self._find_group(self.data, path_list)
 
         if path_exists is None:
             return False
         return True
 
-    def insert(self, path, new_name, color=0, hotkey= 0, userparam=0):
+    def insert(self, name, path = '', color = 0, hotkey = 0, userparam = 0):
         """
-        Insert a mark group.
+        Insert a GROUP.
 
         Parameters
         ----------
-        path : str
-            The path of the MARK_GROUP.
-        new_name : str
-            The name of the new mark group.
+        name : str
+            The name of the GROUP to be inserted.
+        path : str, default ''
+            The path of the GROUP.
         color : int, default 0
             A number representing the color. Unknown yet.
         hotkey : int, default 0
@@ -133,96 +132,101 @@ class MarksGroup:
 
         Examples
         --------
-        Insert `M3`, `M4`, `F3` and `F4` at the `Speakers` subgroup.
+        Insert `TextGrid` as a `GROUP`.
 
-        >>> marks_group = sis_meta.MarksGroup()
-        >>> marks_group.insert('TextGrid', 'Luis', 15)
-        >>> marks_group.insert('TextGrid', 'Jorge')
-        >>> marks_group.insert('TextGrid', 'Lucho')
-        >>> marks_group.insert('TextGrid', 'Javier')
-        >>> marks_group.insert('TextGrid', 'Rolando')
+        >>> groups_segment = sis_meta.GroupsSegment()
+        >>> groups_segment.insert('TextGrid', '')
+        
+        Then, insert `Rolando`, `Luis`, `Juan` and `José Roberto` as
+        `SUBGROUPS` of `TextGrid`.
+
+        >>> groups_segment.insert('Rolando', 'TextGrid')
+        >>> groups_segment.insert('Luis', 'TextGrid', 255, 49, 15)
+        >>> groups_segment.insert('Juan', 'TextGrid', userparam = 0)
+        >>> groups_segment.insert('José Roberto', 'TextGrid', hotkey = 49)
         """
         path = self._norm_path(path)
-        parent_names = path.split('/')
+        path_list = path.split('/')
+        group = self._find_group(self.data, path_list)
 
-        mark_group = self._find_mark_group(self.data, parent_names)
-        if mark_group is None:
-            raise MarkGroupNotFoundError(f'Cannot found {path} path.')
+        if group is None:
+            raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
 
         dict_ = {
             'id': self.group_id,
-            'name': new_name,
+            'name': name,
             'color': str(color),
             'hotkey': str(hotkey),
             'userparam': str(userparam),
         }
         self.group_id += 1
-        mark_group.setdefault('child', [])
-        mark_group['child'].append(dict_)
+        group.setdefault('child', [])
+        group['child'].append(dict_)
 
     def update(self, path, name= None, color= None, hotkey= None, userparam= None):
         """
-        Update the attributes of a MARK_GROUP.
+        Update the attributes of a GROUP.
 
         path : str
-            The path of the MARK_GROUP.
-        name : str, defaul `None`
-            The name of the new mark group
+            The path of the GROUP.
+        name : str, default `None`
+            The new name of the GROUP. If `None`, nothing happens.
         color : int, default `None`
             A number representing the color. Unknown yet.
-        hotkey : int, default `None`
+        hotkey : int, default `None`. If `None`, nothing happens.
             A shortcut for inserting marks. Use ASCII table references
             to associate a number with a key. 0 means no association.
-        userparam : int, default `None` 
-            Unkown yet.
+        userparam : int, default `None`
+            Unkown yet. If `None`, nothing happens.
         """
         path = self._norm_path(path)
         path_list = path.split('/')
 
-        mark_group = self._find_mark_group(self.data, path_list)
-        if mark_group is None:
-            raise MarkGroupNotFoundError(f'Cannot found {path} path.')
+        group = self._find_group(self.data, path_list)
+        if group is None:
+            raise GroupNotFoundError(f'Cannot found {path} path.')
 
         if not name is None:
-            mark_group['name'] = name
+            group['name'] = name
 
         if not color is None:
-            mark_group['color'] = color
+            group['color'] = color
 
         if not hotkey is None:
-            mark_group['hotkey'] = hotkey
+            group['hotkey'] = hotkey
 
         if not userparam is None:
-            mark_group['userparam'] = userparam
+            group['userparam'] = userparam
 
     def remove(self, path):
         """
-        Remove a MARK_GROUP.
+        Remove a GROUP.
 
         Parameters
         ----------
         path : str
-            The path of the MARK_GROUP.
+            The path of the target GROUP.
         """
         if not self.is_path(path):
-            raise MarkGroupNotFoundError(f'Cannot found {path} path.')
+            raise GroupNotFoundError(f'Cannot found the GROUP {path}.')
 
         path_list = self._norm_path(path).split('/')
-        mark_group_name = path_list[-1]
-        mark_group_path = path_list[:-1]
-        parent_mark_group = self._find_mark_group(self.data, mark_group_path)
+        group_name = path_list[-1]
+        group_path = path_list[:-1]
 
-        sub_marks_group = parent_mark_group['child']
-        for index_, dict_ in enumerate(sub_marks_group):
-            if dict_['name'] == mark_group_name:
+        group = self._find_group(self.data, group_path)
+        subgroups = group['child']
+
+        for index_, dict_ in enumerate(subgroups):
+            if dict_['name'] == group_name:
                 index = index_
                 break
-        sub_marks_group.pop(index)
+        subgroups.pop(index)
 
-        if len(sub_marks_group) == 0:
-            parent_mark_group.pop('child')
+        if len(subgroups) == 0:
+            group.pop('child')
 
-class MarkGroupNotFoundError(Exception):
+class GroupNotFoundError(Exception):
     """
     Class for exception.
     """
