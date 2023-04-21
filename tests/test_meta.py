@@ -13,10 +13,10 @@ groups_segment.insert('TextGrid')
 groups_segment.insert('Rolando', 'TextGrid')
 groups_segment.insert('Aaron', 'TextGrid')
 
-meta.insert_guide_mark('Speakers/M1', 0.31131, 20.32233, '1')
-meta.insert_guide_mark('TextGrid/Rolando', 1.31222, 3.23, 'Hola')
-meta.insert_guide_mark('TextGrid/Aaron', 4.2323, 10.32, '¿Cómo te va?')
-meta.insert_guide_mark('TextGrid/Rolando', 9.31222, 3.23, 'Bien, todo tranqui')
+meta.insert_guide_mark('Speakers/M1', 0.31131, 20.32233, 'Hoooooola')
+meta.insert_guide_mark('Speakers/M2', 1.31222, 3.23, 'Hola')
+meta.insert_guide_mark('Speakers/M1', 4.2323, 10.32, '¿Cómo te va?')
+meta.insert_guide_mark('Speakers/M2', 9.31222, 3.23, 'Bien, todo tranqui')
+meta.insert_guide_mark('Speakers/M1', 15.31222, 3.23, 'Ah ya qué bueno')
 
-for a in meta:
-    print(a)
+meta.write('sound.wav.meta')

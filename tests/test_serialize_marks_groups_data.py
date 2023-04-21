@@ -2,10 +2,8 @@
 Serialize MARKS_SEGMENT
 """
 from sis_meta.meta import Meta
-from sis_meta.io._serialize_marks_segment import serialize_marks_segment
 from sis_meta.io._serialize_marks_groups_data import serialize_marks_groups_data
 
-meta = Meta()
 meta = Meta()
 groups_segment = meta.manage_groups_segment()
 groups_segment.insert('TextGrid')
@@ -18,4 +16,3 @@ meta.insert_guide_mark('TextGrid/Aaron', 4.2323, 10.32, '¿Cómo te va?')
 meta.insert_guide_mark('TextGrid/Rolando', 9.31222, 3.23, 'Bien, todo tranqui')
 
 marks_segment = serialize_marks_groups_data(meta)
-print(marks_segment)
