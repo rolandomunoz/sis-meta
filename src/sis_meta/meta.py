@@ -14,6 +14,9 @@ class Meta:
     def __iter__(self):
         return iter(self.data)
 
+    def _sort(self):
+        self.data = sorted(self.data, key=lambda x: x.position)
+
     def manage_groups_segment(self):
         """
         Manage GROUPS_SEGMENT.
@@ -30,6 +33,7 @@ class Meta:
             position, length, text, mark_group_id, mark_group_name
         )
         self.data.append(guide_mark)
+        self._sort()
 
 class GuideMark:
     """
