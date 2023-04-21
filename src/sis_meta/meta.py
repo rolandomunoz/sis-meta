@@ -1,7 +1,7 @@
 """
 Handle annotation files (.meta).
 """
-import sis_meta
+from sis_meta.groups_segment import GroupsSegment
 
 class Meta:
     """
@@ -9,16 +9,26 @@ class Meta:
     """
     def __init__(self):
         self.data = []
-        self.groups_segment = sis_meta.GroupsSegment()
+        self._groups_segment = GroupsSegment()
 
     def __iter__(self):
         return iter(self.data)
 
-    def insert_guide_mark(self, position, length= 0, text= '', group_id= 6):
+    def manage_groups_segment(self):
+        """
+        Manage GROUPS_SEGMENT.
+        """
+        return self._groups_segment
+
+    def insert_guide_mark(self, group_name, position, length = 0, text = ''):
         """
         Insert a guide mark.
         """
-        guide_mark = GuideMark(position, length, text, group_id, 'gaaa')
+        mark_group_id = self._groups_segment.get_id(group_name)
+        mark_group_name = group_name.split('/')[-1]
+        guide_mark = GuideMark(
+            position, length, text, mark_group_id, mark_group_name
+        )
         self.data.append(guide_mark)
 
 class GuideMark:
