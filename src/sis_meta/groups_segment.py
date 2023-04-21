@@ -179,6 +179,7 @@ class GroupsSegment:
         if group is None:
             raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
 
+        self.group_id += 1
         dict_ = {
             'id': self.group_id,
             'name': name,
@@ -186,7 +187,6 @@ class GroupsSegment:
             'hotkey': str(hotkey),
             'userparam': str(userparam),
         }
-        self.group_id += 1
         group.setdefault('child', [])
         group['child'].append(dict_)
 
