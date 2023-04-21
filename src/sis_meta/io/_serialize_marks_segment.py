@@ -1,42 +1,55 @@
 """
-Write meta files.
+Serialize MARKS_SEGMENT 
 """
 import re
 from struct import pack
 from importlib.resources import files
 
 MARKS_SEGMENT = re.compile(
-    rb'.+MARKS_SEGMENT; BEGIN;.+?(\n.+)\n\nMARKS_SEGMENT; END', re.DOTALL
-)
-MARKS_GROUPS_DATA = re.compile(
-    b'MARKS_GROUPS_DATA; BEGIN;.+?(\n.+)\n\nMARKS_GROUPS_DATA; END', re.DOTALL
+    rb'MARKS_SEGMENT; BEGIN;.+?(\n.+)\n\nMARKS_SEGMENT; END', re.DOTALL
 )
 
-def write_meta_file(data, meta_path):
-    """
-    Write a meta file.
+template_path = files('sis_meta.io') / 'templates/marks_segment.meta'
 
-    Parameters:
-    -----------
-    data : {'positions': list of float, 'lengths': list of float,
-        'ids': list of int, 'texts': list of str}
-        The data needed for writing guide marks.
-    meta_path : path-like object
-        The path of the meta file.
+def serialize_marks_segment(meta):
     """
-    meta = build_meta(
+    Serialize a :class:`meta_sis.meta.Meta` object.
+
+    Parameters
+    ----------
+    meta : :class:`meta_sis.meta.Meta`
+        An object representing a Meta file
+
+    Returns
+    -------
+    bytes
+        The content of MARKS_SEGMENT
+    """
+    data = {
+        'positions': [],
+        'lengths': [],
+        'lengths': [],
+        'ids': [],
+        'texts': [],
+    }
+
+    for mark in meta.data:
+        data['positions'].append(mark.position)
+        data['lengths'].append(mark.length)
+        data['texts'].append(mark.text)
+        data['ids'].append(mark.group_id)
+
+    meta = build_marks_segment(
         data['positions'],
         data['lengths'],
         data['ids'],
         data['texts']
     )
+    return meta
 
-    # Write file
-    meta_path.write_bytes(meta)
-
-def build_meta(positions, lengths, ids, texts):
+def build_marks_segment(positions, lengths, ids, texts):
     """
-    Build the content of a meta file.
+    Build the content of MARKS_SEGMENT.
 
     Parameters
     -----------
@@ -56,10 +69,10 @@ def build_meta(positions, lengths, ids, texts):
 
     Notes
     -----
-    The parameters must be equal in length. In the other hand, at this
-    moment, ids are limited to the ones existing in the the template: 2
-    , 3, 4, 6, 7, 8, 9, 10, 11 and 13. I recommmend to use only 6, 7, 8
-    and 9. Those are M1, M2, F1 and F2 groups.
+    The parameters must be equal in length. In the other hand, ids are 
+    limited to the ones existing in the GROUPS_SEGMENT. The most commons
+    are 6, 7, 8 and 9. Those are M1, M2, F1 and F2 groups. In standard
+    files, they are: 2, 3, 4, 6, 7, 8, 9, 10, 11 and 13.
 
     TEXT_ATTR_POSITIONS, TEXT_ATTR_LENGTHS, TEXT_ATTR_TYPES and
     TEXT_ATTR_VALUES seem to have the same attributes; so I decided to
@@ -68,7 +81,6 @@ def build_meta(positions, lengths, ids, texts):
     The lists pass as arguments must have the same lenght.
     """
     # Load template
-    template_path = files('sis_meta.io') / 'template.meta'
     data = template_path.read_bytes()
 
     n_items = len(positions)
@@ -105,9 +117,6 @@ def build_meta(positions, lengths, ids, texts):
     # Calc sizes
     match = MARKS_SEGMENT.match(data)
     data = data.replace(b'{{ marks_segment_size }}', str(len(match.group(1))).encode())
-
-    match = MARKS_GROUPS_DATA.match(data)
-    data = data.replace(b'{{ file_size }}', str(len(match.group(1))).encode())
 
     return data
 
