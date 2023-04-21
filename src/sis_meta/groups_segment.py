@@ -57,6 +57,18 @@ class GroupsSegment:
     def _find_group(self, data, path):
         """
         Find a GROUP dict.
+
+        Parameters
+        ----------
+        data : list of dict
+            An attribute of the :class:`sis_meta.groups_segment.GroupsSegment`.
+        path : list
+            list of GROUP items.
+
+        Returns
+        -------
+        dict or None
+            A GROUP dict. If the path does not exist, then return `None`
         """
         group_name = path[0]
         group_name_path = path[1:]
@@ -94,6 +106,17 @@ class GroupsSegment:
         if not path.startswith('All marks'):
             path = 'All marks' if path == '' else f'All marks/{path}'
         return path
+
+    def get_id(self, path):
+        """
+        Get the ID of a GROUP.
+        """
+        path_ = self._norm_path(path).split('/')
+        group = self._find_group(self.data, path_)
+
+        if group is None:
+            raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
+        return group['id']
 
     def is_path(self, path):
         """
