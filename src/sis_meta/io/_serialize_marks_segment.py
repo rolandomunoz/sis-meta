@@ -144,12 +144,31 @@ def _norm_text(text_list):
         - Semicolons (``;``) are replaced by ``U+0002``
         - New lines (``\n``) are replaced by ``U+0003``
         - Empty characters (``''``) are replaced by ``_|!!|_nuse``
+        - Tabs can be inserted in SIS; However, they are removed when they are
+        read again. Characters at the rights are also removed.
+        - It seems that each text mark is limited to 1023 bytes.
+        - It seems that all text marks are limited to less than 3000 bytes.
     """
-    texts_bytes = [text.encode() for text in text_list]
-    texts_bytes = [text.replace(b'\n', bytes.fromhex('02')) for text in texts_bytes] #Start of Text: U+0002
-    texts_bytes = [text.replace(b';', bytes.fromhex('03')) for text in texts_bytes] #End of Text: U+0003
-    texts_bytes = [b'_|!!|_nuse' if text == b'' else text for text in texts_bytes]
-    return b';'.join(texts_bytes)
+    list_ = []
+    for text in text_list:
+        text = text.encode()
+        text = text.replace(b'\n', bytes.fromhex('02')) #Start of Text: U+0002
+        text = text.replace(b';', bytes.fromhex('03')) #End of Text: U+0003
+        text = text.replace(b'\t', b' ')
+        if text == b'':
+            text = b'_|!!|_nuse'
+
+        if len(text) > MAX_BYTES_TEXT_MARK:
+            text = text[0:MAX_BYTES_TEXT_MARK].decode(errors = 'ignore').encode()
+        list_.append(text)
+
+    bytes_block = b';'.join(list_)
+    index = 0
+    while len(bytes_block) > MAX_BYTES_ALL_TEXT_MARKS:
+        index -= 1
+        list_[index] = b'1'
+        bytes_block = b';'.join(list_)
+    return bytes_block
 
 def _update_meta(data, bytes_block, size_tag = None, data_tag = None):
     """
