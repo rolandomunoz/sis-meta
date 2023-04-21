@@ -101,6 +101,10 @@ def build_marks_segment(positions, lengths, ids, texts):
 
     # TEXTS
     bytes_block = _norm_text(texts)
+    if n_items < 16:
+        bytes_block = b'TEXTS; ' + bytes_block
+    else:
+        bytes_block = b'TEXTS; BEGIN; VECTOR_STRING\n' + bytes_block + b'\nTEXTS; END'
     data = _update_meta(data, bytes_block, data_tag = '{{ texts }}')
 
     # TEXT_ATTR_POSITIONS
