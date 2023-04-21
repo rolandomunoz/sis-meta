@@ -2,6 +2,7 @@
 Handle annotation files (.meta).
 """
 from sis_meta.groups_segment import GroupsSegment
+from sis_meta.io._serialize_marks_groups_data import serialize_marks_groups_data
 
 class Meta:
     """
@@ -34,6 +35,14 @@ class Meta:
         )
         self.data.append(guide_mark)
         self._sort()
+
+    def write(self, path):
+        """
+        Write a meta file.
+        """
+        content = serialize_marks_groups_data(self)
+        with open(path, 'wb') as meta_file:
+            meta_file.write(content)
 
 class GuideMark:
     """
