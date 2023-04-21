@@ -11,7 +11,7 @@ LENGTHS; BEGIN; VECTOR_DOUBLE;BINARY;{{ lengths_size }}
 {{ lengths }}
 LENGTHS; END
 
-TEXTS; {{ texts }}
+{{ texts }}
 
 TEXT_ATTR_POSITIONS; BEGIN; MATRIX_INT;BINARY;{{ attr_size }}
 {{ text_attr_positions }}
