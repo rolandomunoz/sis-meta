@@ -5,6 +5,9 @@ import re
 from struct import pack
 from importlib.resources import files
 
+MAX_BYTES_TEXT_MARK = 1022
+MAX_BYTES_ALL_TEXT_MARKS = 3001
+
 MARKS_SEGMENT = re.compile(
     rb'MARKS_SEGMENT; BEGIN;.+?(\n.+)\n\nMARKS_SEGMENT; END', re.DOTALL
 )
