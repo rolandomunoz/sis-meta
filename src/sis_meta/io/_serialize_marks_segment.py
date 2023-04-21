@@ -70,9 +70,17 @@ def build_marks_segment(positions, lengths, ids, texts):
     Notes
     -----
     The parameters must be equal in length. In the other hand, ids are 
-    limited to the ones existing in the GROUPS_SEGMENT. The most commons
-    are 6, 7, 8 and 9. Those are M1, M2, F1 and F2 groups. In standard
-    files, they are: 2, 3, 4, 6, 7, 8, 9, 10, 11 and 13.
+    limited to the ones existing in the GROUPS_SEGMENT. By default they are:
+        - 2 for `Single`
+        - 3 for `Sounds`
+        - 4 for `Noises`
+        - 6 for `Speakers/M1`
+        - 7 for `Speakers/M2`
+        - 8 for `Speakers/F1`
+        - 9 for `Speakers/F2`
+        - 10 for `VAD`
+        - 11 for `For_AutoCmp`
+        - 13 for `Edit_Tracker/ET_LM`
 
     TEXT_ATTR_POSITIONS, TEXT_ATTR_LENGTHS, TEXT_ATTR_TYPES and
     TEXT_ATTR_VALUES seem to have the same attributes; so I decided to
