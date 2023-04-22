@@ -88,6 +88,34 @@ class GroupsSegment:
             if 'child' in dict_:
                 return self._find_group(dict_['child'], group_name_path)
 
+    def _find_group_by_id(self, data, id_):
+        """
+        Find a GROUP dict.
+
+        Parameters
+        ----------
+        data : list of dict
+            An attribute of the :class:`sis_meta.groups_segment.GroupsSegment`.
+        id_ : int
+            The group id.
+
+        Returns
+        -------
+        dict or None
+            A GROUP dict. If the path does not exist, then return `None`
+        """
+        # Base case
+        for dict_ in data:
+            # Base case
+            if dict_['id'] == id_:
+                return dict_
+
+            # Recursive case
+            if 'child' in dict_:
+                return self._find_group_by_id(dict_['child'], id_)
+
+        return None
+
     @staticmethod
     def _norm_path(path):
         """
@@ -117,6 +145,12 @@ class GroupsSegment:
         if group is None:
             raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
         return group['id']
+
+    def get_name(self, group_id):
+        """
+        Get the name of a GROUP.
+        """
+        self._find_group_by_id(self.data, group_id)
 
     def is_path(self, path):
         """
