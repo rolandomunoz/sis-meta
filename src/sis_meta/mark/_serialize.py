@@ -12,16 +12,16 @@ MARKS_SEGMENT = re.compile(
     rb'MARKS_SEGMENT; BEGIN;.+?(\n.+)\n\nMARKS_SEGMENT; END', re.DOTALL
 )
 
-template_path = files('sis_meta.io') / 'templates/marks_segment.meta'
+template_path = files('sis_meta.mark') / 'templates/marks_segment.meta'
 
 def serialize_marks_segment(meta):
     """
-    Serialize a :class:`meta_sis.meta.Meta` object.
+    Serialize the marks in a :class:`meta_sis.Meta` object.
 
     Parameters
     ----------
-    meta : :class:`meta_sis.meta.Meta`
-        An object representing a Meta file
+    meta : :class:`meta_sis.Meta`
+        A class for handling Meta files.
 
     Returns
     -------
@@ -36,7 +36,7 @@ def serialize_marks_segment(meta):
         'texts': [],
     }
 
-    for mark in meta.data:
+    for mark in meta:
         data['positions'].append(mark.position)
         data['lengths'].append(mark.length)
         data['texts'].append(mark.text)
