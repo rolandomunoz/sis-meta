@@ -1,12 +1,12 @@
 """
 Read a meta file.
 """
-from sis_meta import Meta
+from sis_meta.meta import Meta
 from sis_meta.groups import GroupsSegment
-from sis_meta.marks import GuideMark
-from sis_meta.io._parse_marks_segment import parse_marks_segment
-from sis_meta.io.exceptions import MetaFileError
+from sis_meta.mark import GuideMark
+from sis_meta.mark._parse import parse_marks_segment
 from sis_meta.regex import META_PATTERN
+from sis_meta.io.exceptions import MetaFileError
 
 def read_from_file(path):
     """
@@ -32,14 +32,16 @@ def read_from_file(path):
     meta = Meta() # Initialize a meta object
 
     # GROUPS_SEGMENT
-    meta._groups = GroupsSegment(path)
+    meta._groups = GroupsSegment(
+        match.group('GROUPS_SEGMENT')
+    )
 
     # MARKS_SEGMENT
-    marks_segment = parse_marks_segment(
+    marks = parse_marks_segment(
         match.group('MARKS_SEGMENT')
     )
     list_ = []
-    for position, length, text, group_id in marks_segment:
+    for position, length, text, group_id in marks:
         group_name = meta._groups.get_name(group_id)
         list_.append(
             GuideMark(position, length, text, group_id, group_name)
