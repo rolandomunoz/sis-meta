@@ -8,7 +8,7 @@ from pprint import pprint
 from sis_meta import Meta
 
 meta = Meta()
-groups_segment = meta.manage_groups_segment()
+groups_segment = meta.manage_groups()
 
 # Praat > TextGrid
 groups_segment.insert('TextGrid')
