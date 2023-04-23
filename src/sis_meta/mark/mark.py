@@ -43,4 +43,3 @@ class GuideMark:
             `True` if the length is greater than 0. Otherwise, it returns `False`.
         """
         return self.length == 0
-
