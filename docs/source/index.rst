@@ -18,6 +18,7 @@ If you find this project useful, please consider to support it.
    :caption: Contents:
 
    quick_start
+   api_reference
 
 Indices and tables
 ==================
