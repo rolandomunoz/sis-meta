@@ -3,19 +3,11 @@ Read meta files.
 """
 import sys
 from pathlib import Path
-sis_meta_path = str(Path(__file__).parent.parent.joinpath('src'))
-sys.path.insert(0, sis_meta_path)
-import sis_meta
 
-data_dir = Path(__file__).parent / 'data'
-for meta_path in data_dir.glob('*.meta'):
-    meta = sis_meta.read_from_file(meta_path)
+from sis_meta import read_from_file
 
-    print(meta_path.name)
-    for guide_mark in meta:
-        print('')
-        print('position: ', guide_mark.position)
-        print('length: ', guide_mark.length)
-        print('group_id: ', guide_mark.group_id)
-        print('group_name: ', guide_mark.group_name)
+meta_path_in = Path(__file__).parent / 'data' / 'sound3.wav.meta'
+meta_path_out = meta_path_in.parent / f'{meta_path_in.stem}.metatest'
 
+meta = read_from_file(meta_path_in)
+meta.write(meta_path_out)
