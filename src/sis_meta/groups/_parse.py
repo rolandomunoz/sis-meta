@@ -2,12 +2,13 @@
 Parse GROUPS_SEGMENT into a list of dict. 
 """
 import re
+import io
 
 GROUP = re.compile(rb'''ID; (?P<id>\d+)
 
 NAME; (?P<name>.+)
 
-COLOR; (?P<color>\d+)
+COLOR; (?P<color>-{0,1}\d+)
 
 HOTKEY; (?P<hotkey>\d+)
 
@@ -20,15 +21,32 @@ GROUP_OPEN = re.compile(rb'GROUP(\d+); BEGIN; COMPOSITE;BINARY;(\d+)\n')
 SUBGROUP_OPEN = re.compile(rb'SUBGROUPS; BEGIN; COMPOSITE;BINARY;\d+\n')
 SUBGROUP_CLOSE = re.compile(rb'SUBGROUPS; END\n')
 
+def parse_groups_segment(raw_data):
+    """
+    Discover group tree structure recursively.
+
+    Parameters
+    ----------
+    raw_data : bytes
+        The GROUPS_SEGMENT data in meta files.
+
+    Returns
+    -------
+    list of dict
+        Returns the GROUPS_SEGMENT in structured way.
+    """
+    data = io.BytesIO(raw_data)
+    return discover_grouptree(data, [])
+
 def discover_grouptree(data, tree):
     """
     Discover group tree structure recursively.
 
     Parameters
     ----------
-    data : :class:`io.BufferedReader` or :class:`io.BytesIO`
-        Binary stream.
-    tree : list of dict
+    data : :class:`io.BytesIO`
+        Binary stream containing the GROUPS_SEGMENT data in meta files.
+    tree : list
         It contains the mark groups info.
 
     Returns
