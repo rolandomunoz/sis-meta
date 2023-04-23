@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from pprint import pprint
 
-from sis_meta.io._parse_groups_segment import discover_grouptree
+from sis_meta.groups._parse import discover_grouptree
 
 path = Path(sys.argv[1])
 
