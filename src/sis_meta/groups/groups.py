@@ -5,39 +5,23 @@ import re
 import io
 from importlib.resources import files
 
-from sis_meta.io._parse_groups_segment import discover_grouptree
-from sis_meta.io._serialize_groups_segment import serialize_groups_segment
-
-GROUPS_SEGMENT= re.compile(
-rb'''MARKS_GROUPS_DATA; BEGIN; COMPOSITE;BINARY;\d+
-VERSION; 2
-
-GROUPS_SEGMENT; BEGIN; COMPOSITE;BINARY;\d+
-(.+)
-GROUPS_SEGMENT; END
-''', re.DOTALL
-)
+from sis_meta.groups._parse import parse_groups_segment
+from sis_meta.groups._serialize import serialize_groups_segment
 
 class GroupsSegment:
     """
-    A class for handling GROUPS_SEGMENT
+    A class for handling GROUPS_SEGMENT.
     """
-    def __init__(self, path= None):
+    def __init__(self, raw_data = None):
         self.data = None
 
-        if path is None:
-            path = files('sis_meta.io.templates') / 'grouptree.meta'
+        if raw_data is None:
+            path = files('sis_meta.groups.templates') / 'grouptree.meta'
             with open(path, 'rb') as raw_file:
-                self.data = discover_grouptree(raw_file, [])
+                raw_data = raw_file.read()
+                self.data = parse_groups_segment(raw_data)
         else:
-            with open(path, 'rb') as raw_file:
-                match = GROUPS_SEGMENT.match(raw_file.read())
-                if not match:
-                    raise IOError(f'{path} is not a meta file.')
-                self.data = discover_grouptree(
-                    io.BytesIO(match.group(1)),
-                    []
-                )
+            self.data = parse_groups_segment(raw_data)
         self.group_id = self._find_max_id(self.data)
 
     def __repr__(self):
