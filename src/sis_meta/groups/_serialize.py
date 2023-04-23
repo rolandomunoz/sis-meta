@@ -7,7 +7,7 @@ from jinja2 import PackageLoader
 from jinja2 import select_autoescape
 
 env = Environment(
-    loader = PackageLoader("sis_meta.io"),
+    loader = PackageLoader("sis_meta.groups"),
     autoescape = select_autoescape()
 )
 env.trim_blocks = True
