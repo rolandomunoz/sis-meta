@@ -5,6 +5,7 @@ from importlib.resources import files
 import re
 
 from sis_meta.mark._serialize import serialize_marks_segment
+from sis_meta.io.exceptions import MetaFileError
 
 MARKS_GROUPS_DATA = re.compile(
 rb'''MARKS_GROUPS_DATA; BEGIN; COMPOSITE;BINARY;{{ TOTAL_SIZE }}(
@@ -29,6 +30,9 @@ def write_meta(meta, path):
     path : path-like
         The path of the meta file.
     """
+    if len(meta) == 0:
+        raise MetaFileError('Cannot write a Meta object without marks!')
+
     content = serialize_marks_groups_data(meta)
     with open(path, 'wb') as meta_file:
         meta_file.write(content)
@@ -37,9 +41,7 @@ def serialize_marks_groups_data(meta):
     """
     Serialize a :class:`sis_meta.Meta` object.
     """
-    groups_segment = meta.manage_groups()
-
-    groups_segment_bytes = str(groups_segment).encode()
+    groups_segment_bytes = str(meta._groups).encode()
     marks_segment_bytes = serialize_marks_segment(meta)
 
     with open(template_path, 'rb') as meta_file:
