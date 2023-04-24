@@ -12,7 +12,7 @@ class GroupsSegment:
     """
     A class for handling GROUPS_SEGMENT.
     """
-    def __init__(self, raw_data = None):
+    def __init__(self, raw_data=None):
         self.data = None
 
         if raw_data is None:
@@ -119,6 +119,49 @@ class GroupsSegment:
             path = 'All marks' if path == '' else f'All marks/{path}'
         return path
 
+    @staticmethod
+    def _rgb_to_int(rgb):
+        """
+        Represent a RGB tuple as a negative integer ranging from -1 to -16777216.
+
+        Parameters
+        ----------
+        rgb : (int, int, int)
+            A 3-tuple representing the RGB color system. The first element
+            is for RED, the second is for GREEN and the third is for BLUE.
+            Each digit ranges from 0 to 255.
+
+        Returns
+        -------
+        int
+            A negative integer for the given RGB value.
+
+        Examples
+        ---------
+        >>> rgb_to_meta_color_id(255, 255, 255)
+        >>> -1
+        >>> rgb_to_meta_color_id(255, 255, 254)
+        >>> -2
+        >>> rgb_to_meta_color_id(255, 255, 0)
+        >>> -256
+        >>> rgb_to_meta_color_id(255, 254, 255)
+        >>> -257
+
+        Notes
+        -----
+        Colors in SIS are represented as RGB values in the UI, and as
+        negative integers in the meta files.
+        """
+        global BASE_VALUE 
+        global MAX_VALUE
+        MAX_VALUE = 255
+        BASE_VALUE = 256
+
+        blue = MAX_VALUE - rgb[0]
+        green = MAX_VALUE - rgb[1]
+        red = MAX_VALUE - rgb[2]
+        return -(blue*BASE_VALUE**2 + green*BASE_VALUE + red + 1)
+
     def get_id(self, path):
         """
         Get the ID of a GROUP.
@@ -157,18 +200,16 @@ class GroupsSegment:
             return False
         return True
 
-    def insert(self, name, path = '', color = 0, hotkey = 0, userparam = 0):
+    def insert(self, path, color=None, hotkey=0, userparam=0):
         """
         Insert a GROUP.
 
         Parameters
         ----------
-        name : str
-            The name of the GROUP to be inserted.
-        path : str, default ''
+        path : str
             The path of the GROUP.
-        color : int, default 0
-            A number representing the color. Unknown yet.
+        color : (int, int, int) or None, default None
+            A tuple representing the color in RGB system.
         hotkey : int, default 0
             A shortcut for inserting marks. Use ASCII table references
             to associate a number with a key. 0 means no association.
@@ -177,38 +218,45 @@ class GroupsSegment:
 
         Examples
         --------
-        Insert `TextGrid` as a `GROUP`.
+        Insert `MyCats` as a `GROUP`.
 
         >>> groups_segment = sis_meta.GroupsSegment()
-        >>> groups_segment.insert('TextGrid', '')
+        >>> groups_segment.insert('MyCats')
         
-        Then, insert `Rolando`, `Luis`, `Juan` and `José Roberto` as
-        `SUBGROUPS` of `TextGrid`.
+        Then, insert ``Akuma``, ``Kirris``, ``Lala``, ``Gato negro`` and
+        ``Gato gordo`` as `SUBGROUPS` of `MyCats`.
 
-        >>> groups_segment.insert('Rolando', 'TextGrid')
-        >>> groups_segment.insert('Luis', 'TextGrid', 255, 49, 15)
-        >>> groups_segment.insert('Juan', 'TextGrid', userparam = 0)
-        >>> groups_segment.insert('José Roberto', 'TextGrid', hotkey = 49)
+        >>> groups_segment.insert('MyCats/Akuma')
+        >>> groups_segment.insert('MyCats/Kirris')
+        >>> groups_segment.insert('MyCats/Lala', (244, 219, 243), 49, 15)
+        >>> groups_segment.insert('MyCats/Gato negro', color = (0, 0, 0))
+        >>> groups_segment.insert('MyCats/Gato gordo', hotkey = 49)
         """
-        path = self._norm_path(path)
-        path_list = path.split('/')
-        group = self._find_group(self.data, path_list)
+        path_norm = self._norm_path(path)
+        parents = path_norm.split('/')[:-1]
+        name = path_norm.split('/')[-1]
+
+        group = self._find_group(self.data, parents)
 
         if group is None:
             raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
+
+        color_int = 0
+        if not color is None:
+            color_int = self._rgb_to_int(color)
 
         self.group_id += 1
         dict_ = {
             'id': self.group_id,
             'name': name,
-            'color': str(color),
+            'color': str(color_int),
             'hotkey': str(hotkey),
             'userparam': str(userparam),
         }
         group.setdefault('child', [])
         group['child'].append(dict_)
 
-    def update(self, path, name= None, color= None, hotkey= None, userparam= None):
+    def update(self, path, name=None, color=None, hotkey=None, userparam=None):
         """
         Update the attributes of a GROUP.
 
@@ -216,8 +264,8 @@ class GroupsSegment:
             The path of the GROUP.
         name : str, default `None`
             The new name of the GROUP. If `None`, nothing happens.
-        color : int, default `None`
-            A number representing the color. Unknown yet.
+        color : (int, int, int) or None, default None
+            A tuple representing the color in RGB system.
         hotkey : int, default `None`. If `None`, nothing happens.
             A shortcut for inserting marks. Use ASCII table references
             to associate a number with a key. 0 means no association.
@@ -235,7 +283,7 @@ class GroupsSegment:
             group['name'] = name
 
         if not color is None:
-            group['color'] = color
+            group['color'] = self._rgb_to_int(color)
 
         if not hotkey is None:
             group['hotkey'] = hotkey
