@@ -34,7 +34,7 @@ You can use :func:`~sis_meta.read_from_file()` to load the content of a
     path = '/home/Documents/data/sound1.wav.meta'
     meta = sis_meta.read_from_file(path)
 
-When a :class:`~meta_sis.Meta` object is obtained in this way, it contains
+When a :class:`~sis_meta.Meta` object is obtained in this way, it contains
 the `guide marks` and also the `groups` that were defined in the original
 file.
 
