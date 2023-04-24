@@ -37,11 +37,9 @@ class Meta:
             These parameters will be passed to 
             :meth:`~sis_meta.groups.GroupsSegment.insert`
         """
-        parent = '/'.join(group_path.split('/')[:-1])
-        name = group_path.split('/')[-1]
-        self._groups.insert(name, parent, *args, **kwargs)
+        self._groups.insert(group_path, *args, **kwargs)
 
-    def update_group(self, group_path, new_name = None, **kwargs):
+    def update_group(self, group_path, new_name=None, **kwargs):
         """
         Update the attributes in a group.
 
@@ -77,7 +75,7 @@ class Meta:
         group_name = group_path.split('/')[-1]
         self._data = [mark for mark in self if not mark.group_name == group_name]
 
-    def insert_guide_mark(self, group_name, position, length = 0, text = ''):
+    def insert_guide_mark(self, group_name, position, length=0, text=''):
         """
         Insert a guide mark.
         """
