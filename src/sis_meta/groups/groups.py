@@ -200,7 +200,7 @@ class GroupsSegment:
             return False
         return True
 
-    def insert(self, path, color=None, hotkey=0, userparam=0):
+    def insert(self, path, color=None, hotkey=None, userparam=0):
         """
         Insert a GROUP.
 
@@ -210,11 +210,15 @@ class GroupsSegment:
             The path of the GROUP.
         color : (int, int, int) or None, default None
             A tuple representing the color in RGB system.
-        hotkey : int, default 0
-            A shortcut for inserting marks. Use ASCII table references
-            to associate a number with a key. 0 means no association.
-        userparam : int, default 0
-            Unkown yet.
+        hotkey : str or None, default None
+            A single ASCII character that works as a shortcut when inserting marks.
+            If ``None``, no shortcut is associated with the group.
+        userparam : {0, 16, 32, 48}
+            A set of values for making visible marks and texts.
+            - 0: (visible_marks=True, text_visible=True)
+            - 16: (visible_marks=True, text_visible=False)
+            - 32: (visible_marks=False, text_visible=True)
+            - 48: (visible_marks=False, text_visible=False)
 
         Examples
         --------
@@ -230,7 +234,7 @@ class GroupsSegment:
         >>> groups_segment.insert('MyCats/Kirris')
         >>> groups_segment.insert('MyCats/Lala', (244, 219, 243), 49, 15)
         >>> groups_segment.insert('MyCats/Gato negro', color = (0, 0, 0))
-        >>> groups_segment.insert('MyCats/Gato gordo', hotkey = 49)
+        >>> groups_segment.insert('MyCats/Gato gordo', hotkey = 'r')
         """
         path_norm = self._norm_path(path)
         parents = path_norm.split('/')[:-1]
@@ -241,17 +245,16 @@ class GroupsSegment:
         if group is None:
             raise GroupNotFoundError(f'Cannot found the GROUP "{path}".')
 
-        color_int = 0
-        if not color is None:
-            color_int = self._rgb_to_int(color)
+        color_int = 0 if color is None else self._rgb_to_int(color)
+        hotkey_int = 0 if hotkey is None else ord(hotkey.upper())
 
         self.group_id += 1
         dict_ = {
             'id': self.group_id,
             'name': name,
-            'color': str(color_int),
-            'hotkey': str(hotkey),
-            'userparam': str(userparam),
+            'color': color_int,
+            'hotkey': hotkey_int,
+            'userparam': userparam,
         }
         group.setdefault('child', [])
         group['child'].append(dict_)
@@ -267,10 +270,10 @@ class GroupsSegment:
         color : (int, int, int) or None, default None
             A tuple representing the color in RGB system.
         hotkey : int, default `None`. If `None`, nothing happens.
-            A shortcut for inserting marks. Use ASCII table references
-            to associate a number with a key. 0 means no association.
-        userparam : int, default `None`
-            Unkown yet. If `None`, nothing happens.
+            A single ASCII character that works as a shortcut when inserting marks.
+        userparam : {0, 16, 32, 48}
+            A set of values for making visible marks and texts. See
+            :meth:`~sis_meta.groups.GroupsSegment.insert`.
         """
         path = self._norm_path(path)
         path_list = path.split('/')
@@ -286,7 +289,7 @@ class GroupsSegment:
             group['color'] = self._rgb_to_int(color)
 
         if not hotkey is None:
-            group['hotkey'] = hotkey
+            group['hotkey'] = ord(hotkey)
 
         if not userparam is None:
             group['userparam'] = userparam
