@@ -27,28 +27,54 @@ class Meta:
 
     def insert_group(self, group_path, *args, **kwargs):
         """
-        Insert a group.
+        Insert a new group.
+
+        Parameters
+        ----------
+        group_path : str
+            The path of the group.
+        **args : tuple
+            These parameters will be passed to 
+            :meth:`~sis_meta.groups.GroupsSegment.insert`
+        **kwargs : dict
+            These parameters will be passed to 
+            :meth:`~sis_meta.groups.GroupsSegment.insert`
         """
         parent = '/'.join(group_path.split('/')[:-1])
         name = group_path.split('/')[-1]
         self._groups.insert(name, parent, *args, **kwargs)
 
-    def update_group(self, group_path, name = None, **kwargs):
+    def update_group(self, group_path, new_name = None, **kwargs):
         """
         Update the attributes in a group.
+
+        Parameters
+        ----------
+        group_path : str
+            The path of the group.
+        name : str or None, default None.
+            The new name of the group.
+        **kwargs : dict
+            These parameters will be passed to 
+            :meth:`~sis_meta.groups.GroupsSegment.update`
         """
         self._groups.update(group_path, name, **kwargs)
-        if not name is None:
+        if not new_name is None:
             # Update guide marks
             group_name = group_path.split('/')[-1]
             for mark in self:
                 if not mark.group_name == group_name:
                     continue
-                mark.group_name = name
+                mark.group_name = new_name
 
     def remove_group(self, group_path):
         """
         Remove a group and the guide marks associated with it.
+
+        Parameters
+        ----------
+        group_path : str
+            The path of the group.
         """
         self._groups.remove(group_path)
         group_name = group_path.split('/')[-1]
