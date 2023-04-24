@@ -164,69 +164,79 @@ while ``Speakers/M2`` is the group of the second mark.
 Manage groups
 -------------
 
-Use :meth:`~sis_meta.Meta.manage_groups` to handle the groups in your 
-:class:`~sis_meta.Meta` instance. This returns a :class:`~sis_meta.groups.GroupsSegment`
-object. You can use it to add, modify or delete any `group`.
+Inserting groups
+~~~~~~~~~~~~~~~~
+You can handle the groups in your :class:`~sis_meta.Meta` instance. 
+
+To insert a new group use :meth:`~sis_meta.Meta.insert_group` and pass
+the name of the group as the first argument. Let's create a group named
+``Akuma``.
 
 .. code-block:: python
 
     meta = Meta()
 
     # Manage groups
-    groups = meta.manage_groups()
+    meta.insert_group('Akuma')
 
-
-
-Let's say we want to create a new group with the name of a my friend's cat
-``Akuma``. We use :meth:`~sis_meta.groups.GroupsSegment.insert` to do it.
-
-.. code-block:: python
-
-    meta = Meta()
-
-    # Manage groups
-    groups = meta.manage_groups()
-    groups.insert('Akuma')
-
-Now, we can use ``Akuma`` as a group name for our new guide mark.
+Now that we have created a new group called ``Akuma``, it is time to insert
+a guide mark.
 
 .. code-block:: python
 
     >>> meta.insert_guide_mark('Akuma', 10.424, 1.32, 'Meow')
 
-We can also create nested groups. For this example, we create a parent
-group called ``MyCats`` that contains two child groups: ``Akuma`` and
-``Kirris``.
+We can also create subgroups for our marks. For this example, we create
+a parent group called ``MyCats`` that contains two child groups: ``Akuma``
+and ``Kirris``.
 
 .. code-block:: python
 
     meta = Meta()
 
-    # Manage groups
-    groups = meta.manage_groups()
+    meta.insert_group('MyCats') # Parent group
+    meta.insert_group('MyCats/Akuma') # Child group
+    meta.insert_group('MyCats/Kirris') # Child group
 
-    groups.insert('MyCats') # Parent group
-    groups.insert('Akuma', 'MyCats') # Child group
-    groups.insert('Kirris', 'MyCats') # Child group
+In the example, we first create the parent group; then when adding the subgroups,
+we provide a path. The leftmost elements of the path are the parent groups
+while the rightmost element is the name of the group. Elements are separated by a 
+forward slash (``/``). In ``MyCats/Akuma``, we have only a parent group
+``MyCats`` and the rightmost element is ``Akuma``.
 
-In the example, when creating the parent groups, we pass ``MyCats`` as
-the first argument of :meth:`~sis_meta.groups.GroupsSegment.insert`.
-To define a child group, we pass the name of the child group as the
-first argument (``AKuma`` and ``Kirris``), but this time we provide a
-second argument which is the name of the parent group (``MyCats``). 
-
-To insert new marks, we provide ``MyCats/Akuma`` and ``MyCats/Kirris`` in
-the first argument of :meth:`sis_meta.Meta.insert_guide_mark()`.
+We can use the same group paths when inserting new guide marks.
 
 .. code-block:: python
 
     # Insert marks
     meta.insert_guide_mark('Praat/Akuma', 1.753, 2.242, 'Aló')
-    meta.insert_guide_mark('Praat/Aaron', 3.2424, 2.853, 'hola')
+    meta.insert_guide_mark('Praat/Kirris', 3.2424, 2.853, 'hola')
+
+Removing groups
+~~~~~~~~~~~~~~~
+
+You can remove groups using :meth:`~sis_meta.Meta.remove_group`.
+
+.. code-block:: python
+
+    meta = Meta()
+
+    # Insert groups
+    meta.insert_group('Praat')
+    meta.insert_group('Praat/Rolando')
+    meta.insert_group('Praat/Aarón')
+    meta.insert_group('Praat/Javier')
+
+    # Remove marks
+    meta.remove_group('TextGrid/Aarón')
+
+.. WARNING::
+   Beware when removing groups! The marks associated with them will also
+   be removed!
 
 Writing meta files
 ------------------
-You can write new `meta` files using :meth:`sis_meta.Meta.write`.
+You can write new `.meta` file using :meth:`sis_meta.Meta.write`.
 
 .. code-block:: python
 
@@ -238,6 +248,9 @@ You can write new `meta` files using :meth:`sis_meta.Meta.write`.
 
     # Write a meta file
     meta.write()
+
+.. WARNING::
+   You will get an exception if your meta object does not have any marks.
 
 Indices and tables
 ==================
