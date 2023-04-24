@@ -19,12 +19,6 @@ class Meta:
     def _sort(self):
         self._data = sorted(self._data, key=lambda x: x.position)
 
-    def manage_groups(self):
-        """
-        Manage GROUPS_SEGMENT.
-        """
-        return self._groups
-
     def insert_group(self, group_path, *args, **kwargs):
         """
         Insert a new group.
