@@ -85,19 +85,19 @@ Finally, the attributes of this object are printed.
     length:  36.41172247942387
     text: "Hi"
     group_id:  6
-    group_name:  "Speakers/M1"
+    group_name:  "M1"
 
     position:  51.48970447530865
     length:  5.854748328189302
     text:  "Where are you?"
     group_id:  7
-    group_name:  "Speakers/M2"
+    group_name:  "M2"
 
     position:  70.49758603395063
     length:  2.325858924897119
     text: "Uhm..."
     group_id:  6
-    group_name:  "Speakers/M1"
+    group_name:  "M1"
 
 The attributes printed are ``position``, ``length``, ``text``, ``group_id``
 and ``group_name``.
