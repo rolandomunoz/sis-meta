@@ -20,7 +20,7 @@ ID; \d+
 
 NAME; .+
 
-COLOR; \d+
+COLOR; -{0,1}\d+
 
 HOTKEY; \d+
 
