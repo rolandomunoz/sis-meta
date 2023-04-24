@@ -16,6 +16,9 @@ class Meta:
     def __iter__(self):
         return iter(self._data)
 
+    def __len__(self):
+        return len(self._data)
+
     def _sort(self):
         self._data = sorted(self._data, key=lambda x: x.position)
 
@@ -52,7 +55,7 @@ class Meta:
             These parameters will be passed to 
             :meth:`~sis_meta.groups.GroupsSegment.update`
         """
-        self._groups.update(group_path, name, **kwargs)
+        self._groups.update(group_path, new_name, **kwargs)
         if not new_name is None:
             # Update guide marks
             group_name = group_path.split('/')[-1]
