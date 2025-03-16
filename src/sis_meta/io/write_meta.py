@@ -13,7 +13,6 @@ VERSION; 2
 .+
 )
 
-
 MARKS_GROUPS_DATA; END''', re.DOTALL
 )
 
