@@ -31,16 +31,15 @@ def serialize_marks_segment(meta):
     data = {
         'positions': [],
         'lengths': [],
-        'lengths': [],
-        'ids': [],
         'texts': [],
+        'ids': [],
     }
 
     for mark in meta:
         data['positions'].append(mark.position)
         data['lengths'].append(mark.length)
-        data['texts'].append(mark.text)
         data['ids'].append(mark.group_id)
+        data['texts'].append(mark.text)
 
     meta = build_marks_segment(
         data['positions'],
