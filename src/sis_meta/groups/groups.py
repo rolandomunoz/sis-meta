@@ -85,8 +85,8 @@ class GroupsSegment:
 
         Returns
         -------
-        dict or None
-            A GROUP dict. If the path does not exist, then return `None`
+        dict
+            A GROUP dict.
         """
         # Base case
         for dict_ in data:
@@ -96,9 +96,10 @@ class GroupsSegment:
 
             # Recursive case
             if 'child' in dict_:
-                return self._find_group_by_id(dict_['child'], id_)
-
-        return None
+                result = self._find_group_by_id(dict_['child'], id_)
+                if result:
+                    return result
+        return {}
 
     @staticmethod
     def _norm_path(path):
@@ -177,7 +178,8 @@ class GroupsSegment:
         """
         Get the name of a GROUP.
         """
-        self._find_group_by_id(self.data, group_id)
+        group = self._find_group_by_id(self.data, group_id)
+        return group.get('name', '')
 
     def is_path(self, path):
         """
