@@ -27,7 +27,7 @@ def read_from_file(path):
 
     match = META_PATTERN.match(raw_data)
     if not match:
-        MetaFileError(f'Not a Meta File: {path}')
+        raise MetaFileError(f'Not a Meta File: {path}')
 
     meta = Meta() # Initialize a meta object
 
