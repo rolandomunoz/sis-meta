@@ -166,7 +166,7 @@ You can create a new `meta` file using the method `sis_meta.Meta.write()`
   meta.insert_guide_mark('Speakers/M2', 11.93, 2.42, 'Where are you?')
 
   # Write a meta file
-  meta.write()
+  meta.write('home/Documents/data/sound1.wav.meta')
 ```
 
 > [!WARNING]
