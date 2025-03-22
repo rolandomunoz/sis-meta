@@ -244,7 +244,7 @@ You can remove groups using `sis_meta.Meta.remove_group()`
   meta.insert_group('Praat/Rolando')
 
   # Remove marks
-  meta.remove_group('TextGrid/Aarón')
+  meta.remove_group('Praat/Aarón')
  ```
 
 > [!CAUTION]
