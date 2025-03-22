@@ -32,9 +32,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/sis-meta#readme"
-Issues = "https://github.com/unknown/sis-meta/issues"
-Source = "https://github.com/unknown/sis-meta"
+Documentation = "https://github.com/rolandomunoz/sis-meta#readme"
+Issues = "https://github.com/rolandomunoz/sis-meta/issues"
+Source = "https://github.com/rolandomunoz/sis-meta"
 
 [tool.hatch.version]
 path = "src/sis_meta/__about__.py"
